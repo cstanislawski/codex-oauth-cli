@@ -2,31 +2,15 @@
 
 Minimal standalone Rust CLI for:
 
-- browser OAuth against the same ChatGPT/Codex auth flow used by Codex
-- direct requests to `https://chatgpt.com/backend-api/codex/responses`
-- reusable prompt templates
+- browser OAuth against ChatGPT/Codex
+- direct prompts to `https://chatgpt.com/backend-api/codex/responses`
 
 Commands:
 
 ```bash
 cargo run -- login
 cargo run -- status
-cargo run -- templates init
-cargo run -- --template default "Reply with exactly: OK"
-```
-
-Template behavior:
-
-- built-ins: `default`, `code-review`, `commit-message`
-- custom templates live in `~/.config/codex-oauth-cli/templates`
-- `{{prompt}}` placeholder supported
-- optional section markers:
-
-```text
---- system ---
-You are terse.
---- user ---
-{{prompt}}
+cargo run -- --model gpt-5.4 "Reply with exactly: OK"
 ```
 
 Implementation notes:

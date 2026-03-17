@@ -1,5 +1,4 @@
 use crate::auth::StoredAuth;
-use crate::templates::RenderedTemplate;
 use reqwest::blocking::Client;
 use reqwest::header::{HeaderMap, HeaderValue, ACCEPT, AUTHORIZATION, CONTENT_TYPE, USER_AGENT};
 use serde_json::{json, Value};
@@ -14,10 +13,10 @@ pub struct RunOptions {
     pub session_id: Option<String>,
 }
 
-pub fn run(auth: &StoredAuth, template: &RenderedTemplate, options: &RunOptions) -> Result<()> {
+pub fn run(auth: &StoredAuth, prompt: &str, options: &RunOptions) -> Result<()> {
     let client = Client::builder().build()?;
     let url = resolve_url(DEFAULT_BASE_URL);
-    let body = build_body(template, options);
+    let body = build_body(prompt, options);
     let headers = build_headers(auth, options.session_id.as_deref())?;
 
     let response = client.post(url).headers(headers).json(&body).send()?;
@@ -125,25 +124,19 @@ fn extract_completed_text(value: &Value) -> Option<String> {
     Some(text)
 }
 
-fn build_body(template: &RenderedTemplate, options: &RunOptions) -> Value {
-    let instructions = if template.system.trim().is_empty() {
-        "You are a helpful assistant.".to_string()
-    } else {
-        template.system.clone()
-    };
-
+fn build_body(prompt: &str, options: &RunOptions) -> Value {
     json!({
         "model": options.model,
         "store": false,
         "stream": true,
-        "instructions": instructions,
+        "instructions": "You are a helpful assistant.",
         "input": [
             {
                 "role": "user",
                 "content": [
                     {
                         "type": "input_text",
-                        "text": template.user
+                        "text": prompt
                     }
                 ]
             }
